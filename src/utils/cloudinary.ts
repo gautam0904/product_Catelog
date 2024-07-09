@@ -16,7 +16,6 @@ const uploadOnCloudinary = async (localpath: string) => {
         });
         if (response) {
             fs.unlinkSync(localpath);
-            console.log("file is upload on cloudinary", response.url);
         }
         return response;
     } catch (error) {
@@ -38,9 +37,7 @@ const deleteonCloudinary = async (url: string) => {
 
 
         const response = await cloudinary.uploader.destroy(imageName);
-        if (response) {
-            console.log("file is delete on cloudinary");
-        }
+       
         return response;
     } catch (error) {
         return null;

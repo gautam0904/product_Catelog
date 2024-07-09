@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import 'reflect-metadata';
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import container from './config/inversify.config';
 import { connectDB } from './DB/index';
@@ -23,6 +23,13 @@ server.setConfig((app: express.Application) => {
         origin: '*', 
         credentials: true, 
     }));
+    app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+        if (err instanceof multer.MulterError) {
+          // A Multer error occurred when uploading.
+          console.error(err);
+          res.status(400).json({message :  'Multer Error: ' + err.message});
+        } 
+      });
 });
 
 const upload = multer({ dest: 'uploads/' });

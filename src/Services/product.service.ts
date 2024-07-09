@@ -83,28 +83,56 @@ export class ProductService {
     async updateProductWithPicture(id: string, productData: Iproduct) {
         try {
 
-            const productloudinary = await uploadOnCloudinary(productData.productimage);
-
-            const result = await Product.findByIdAndUpdate({
-                _id: id
-            },
+            const existProduct = await Product.findById(id);
+            console.log(productData.productimage);
+  
+            let result;
+            await deleteonCloudinary(existProduct?.productimage as string).then(async (response) => {
+              const productImg = await uploadOnCloudinary(productData.productimage);
+              
+              result = await Product.findByIdAndUpdate(
                 {
+                  _id:id,
+                },
+                {
+                  $set: {
                     name: productData.name,
                     description: productData.description,
-                    productimage: productloudinary?.url,
                     owner: productData.owner,
                     price: productData.price,
                     stock: productData.stock,
-                    category: productData.category
-                });
-
+                    category: productData.category,
+                    productimage: productImg?.url
+                  },
+                },
+                { new: true }
+              );
+              if (result) {
+                return {
+                  statuscode: statuscode.ok,
+                  Content: result,
+                };
+              }
+              throw new ApiError(statuscode.NotImplemented, errMSG.updateUser);
+            }).catch((err: any) => {
+              throw new ApiError(statuscode.NotImplemented, errMSG.updateUser);
+            });
+        
             return {
-                statuscode: 200,
-                Content: {
-                    message: MSG.success("productData updated"),
-                    data: result
-                }
-            }
+              statuscode: statuscode.ok,
+              Content: result,
+            };
+        
+          } catch (error: any) {
+            deleteonCloudinary(this.cloudinaryurl).then((response) => {
+              this.cloudinaryurl = "";
+            });
+            return {
+              statuscode: error.statusCode || statuscode.NotImplemented,
+              Content: error.message,
+            };
+          }
+            
         } catch (error: any) {
             return {
                 statuscode: error.statuscode || 500,
@@ -114,7 +142,6 @@ export class ProductService {
                 }
             }
         }
-    }
 
     async updateProductWithoutPicture(id: string, productData: Iproduct) {
         try {

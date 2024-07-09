@@ -9,9 +9,9 @@ export class Role extends BaseMiddleware{
     handler(req: Request, res: Response, next: NextFunction): void {
         try {
             const permission = {
-                admin: ['/user/deleteUser', '/user/get', '/user/update','/category/create','/category/get','/category/update','/category/delete','/product/create'],
+                admin: ['/user/deleteUser', '/user/get', '/user/update','/user/updatepicture','/product/updatepicture','/product/update','/category/create','/category/get','/category/update','/category/delete','/product/create'],
                
-                user : ['/product/get']
+                user : ['/product/get', '/user/update' , '/user/update','/user/updatepicture']
             }
 
             const role = req.headers.ROLE as string;       
@@ -24,11 +24,8 @@ export class Role extends BaseMiddleware{
             const userPermissions = permission[role as keyof typeof permission];
        
             if(userPermissions.includes(pathname)){
-                req.body.userid = id;
-                req.body.role = role;
                 next();
             }else{
-
                 throw new ApiError(statuscode.forbidden , errMSG.notValidRole(role))
             }
         } catch (error : any) {
