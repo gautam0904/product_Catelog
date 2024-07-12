@@ -26,7 +26,7 @@ role : {
 },
 profilePicture: {
   type : String
-},
+}
 },{timestamps :true});
 
 userschema.pre('save',async function(next){

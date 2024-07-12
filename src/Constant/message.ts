@@ -20,6 +20,7 @@ export const errMSG = {
     notValidRole : (Role: string ) =>{return `${Role} don't have permission to access this functionality.`},
     userNotFound : 'There is no user ',
     notFound : (field : string) =>{return `${field} is not found in our data`},
+    notCreate : (field : string) =>{return `${field} is not created`},
     updateUser : 'User is not updated',
     notFoundDeleted : 'There is no deleted user',
     retreiveUser : 'User is not retrieved',

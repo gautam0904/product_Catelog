@@ -8,6 +8,7 @@ import { Iproduct } from "../interface/model.interface";
 import { ProductService } from "../Services";
 import {TYPES} from "../types/types"
 import { errMSG } from "../Constant/message";
+import { IfilterProduct } from "../interface/request.interface";
 
 @controller("/product", new Auth().handler)
 export class ProductController {
@@ -63,22 +64,27 @@ export class ProductController {
         }
     }
 
-    // @httpGet('/getfiltered')
-    // async getFiltered(req: Request, res: Response) {
-    //     try {
-    //         const filter ={
-    //             type :  req.query.type as string,
-    //         } 
-    //         const posts = await this.product.getFilteredContent(filter);
-    //         res.status(posts.statuscode).json(
-    //             posts.Content
-    //         )
-    //     } catch (error : any) {
-    //         res.status(error.status || 500).json({
-    //             message : error.message
-    //         })
-    //     }
-    // }
+    @httpGet('/getfiltered')
+    async getFiltered(req: Request, res: Response) {
+        try {
+            const filter : IfilterProduct ={
+                search : req.query.search as string,
+                category :  req.query.category as string,
+                minprice : req.query.minprice as string,
+                maxprice : req.query.maxprice as string,
+                maxstock : req.query.maxstock as string,
+                minstock : req.query.minstock as string,
+            } 
+            const posts = await this.product.getFilteredProduct(filter);
+            res.status(posts.statuscode).json(
+                posts.Content
+            )
+        } catch (error : any) {
+            res.status(error.status || 500).json({
+                message : error.message
+            })
+        }
+    }
 
 
     @httpDelete('/delete')

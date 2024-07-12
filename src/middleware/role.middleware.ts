@@ -9,9 +9,9 @@ export class Role extends BaseMiddleware{
     handler(req: Request, res: Response, next: NextFunction): void {
         try {
             const permission = {
-                admin: ['/user/deleteUser', '/user/get', '/user/update','/user/updatepicture','/product/updatepicture','/product/update','/category/create','/category/get','/category/update','/category/delete','/product/create'],
+                admin: ['/user/deleteUser', '/user/get', '/user/update','/user/updatepicture','/product/updatepicture','/product/update','/category/create','/category/get','/category/update','/category/delete','/product/create','/coupon/create','/coupon/get'],
                
-                user : ['/product/get', '/user/update' , '/user/update','/user/updatepicture']
+                user : ['/product/get', '/user/update' , '/user/update','/user/updatepicture' , 'coupon/get']
             }
 
             const role = req.headers.ROLE as string;       

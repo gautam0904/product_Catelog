@@ -10,6 +10,10 @@ ProductService: Symbol.for('ProductService'),
   //category
   CategoryService: Symbol.for('CategoryService'),
   CategoryController: Symbol.for('CategoryController'),
+
+  // coupon
+  CouponService: Symbol.for('CouponService'),
+  CouponController: Symbol.for('CouponController'),
  
   //middleware
   Auth: Symbol.for('Auth'),

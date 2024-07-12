@@ -23,10 +23,7 @@ export class CategoryService {
             }
             return {
                 statuscode: 200,
-                Content: {
-                    message: MSG.success("Category fetched"),
-                    data: result
-                }
+                Content:  result
             }
         } catch (error: any) {
             return {
@@ -99,7 +96,9 @@ export class CategoryService {
     async deleteCategory(id: string) {
         try {
             const result = await Category.findByIdAndDelete(id);
-
+            if (!result) {
+                throw new ApiError(statuscode.NotImplemented, errMSG.notFound("Category"))
+            }
             return {
                 statuscode: 200,
                 Content: {
