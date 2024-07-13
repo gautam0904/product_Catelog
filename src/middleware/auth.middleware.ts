@@ -35,7 +35,8 @@ export class Auth extends BaseMiddleware {
 
         jwt.verify(tokenarray[1] as string, secretkey, (err: any, decoded: any) => {
             if (err) {
-              res.status(statuscode.Unauthorized).send(errMSG.expiredToken)
+              res.status(statuscode.Unauthorized).json({
+                message : errMSG.expiredToken})
               return
             }
             req.find = decoded 

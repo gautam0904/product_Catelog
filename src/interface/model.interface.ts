@@ -32,11 +32,11 @@ export interface Icoupon {
     isActive: boolean;
     startDate: Date;
     endDate: Date;
-    usageLimit: 100;
+    usageLimit: number;
     conditions: [
         {
             conditionType: string;
-            conditionValue: 50,
+            conditionValue: number,
             project_id? : string;
             category_id? : string;
         }

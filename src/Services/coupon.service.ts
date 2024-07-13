@@ -6,10 +6,20 @@ import { statuscode } from "../Constant/statuscode";
 import { errMSG, MSG } from "../Constant/message";
 import { Icouponfilter } from "../interface/request.interface"
 import mongoose from "mongoose";
+import { Request } from "express";
 
 @injectable()
 export class CouponService {
-  async getCoupons(Couponfilter: Icouponfilter) {
+  async getCoupons(couponData: any) {
+    const Couponfilter: Icouponfilter = {
+      Quantity: parseInt(couponData.Quantity),
+      Category: couponData.Category,
+      products: couponData.products,
+      buyprice: parseInt(couponData.buyprice)
+    };
+  
+    console.log("Couponfilter:", Couponfilter);
+  
     try {
       const result = await Coupon.aggregate([
         {
@@ -17,76 +27,60 @@ export class CouponService {
             "isActive": true,
             "endDate": { "$gte": new Date() },
             "$or": [
-              {
-                "conditions.conditionType": "Min Amount",
-                "conditions.conditionValue": { "$lte": Couponfilter.buyprice }
-              },
-              {
-                "conditions.conditionType": "Max Amount",
-                "conditions.conditionValue": { "$gte": Couponfilter.buyprice }
-              },
-              {
-                "conditions.conditionType": "Min Quantity",
-                "conditions.conditionValue": { "$lte": Couponfilter.Quantity }
-              },
-              {
-                "conditions.conditionType": "Max Quantity",
-                "conditions.conditionValue": { "$gte": Couponfilter.Quantity }
-              },
-              {
-                "conditions.conditionType": "Specific Product",
-                "conditions.project_id": new mongoose.Types.ObjectId(Couponfilter.products)
-              },
-              {
-                "conditions.conditionType": "Specific Category",
-                "conditions.category_id": new mongoose.Types.ObjectId(Couponfilter.Category),
-              }
+              { "conditions.conditionType": "Min Amount", "conditions.conditionValue": { "$lte": Couponfilter.buyprice } },
+              { "conditions.conditionType": "Max Amount", "conditions.conditionValue": { "$gte": Couponfilter.buyprice } },
+              { "conditions.conditionType": "Min Quantity", "conditions.conditionValue": { "$lte": Couponfilter.Quantity } },
+              { "conditions.conditionType": "Max Quantity", "conditions.conditionValue": { "$gte": Couponfilter.Quantity } },
+              { "conditions.conditionType": "Specific Product", "conditions.project_id": new mongoose.Types.ObjectId(Couponfilter.products) },
+              { "conditions.conditionType": "Specific Category", "conditions.category_id": new mongoose.Types.ObjectId(Couponfilter.Category) }
             ]
           }
-        },
-   ]);
-
+        }
+      ]);
+  
+   
+  
       result.forEach((coupon: Icoupon) => {
-        if (coupon.type == "Percent-off" || coupon.type == "BOGO") {
-          const percent = coupon.discountValue
-          coupon.payableprice = Couponfilter.buyprice - (Couponfilter.buyprice * percent) / 100
+        if (coupon.type === "Percent-off" || coupon.type === "BOGO") {
+          const percent = coupon.discountValue;
+          coupon.payableprice = Couponfilter.buyprice - (Couponfilter.buyprice * percent) / 100;
         } else {
-          coupon.payableprice = Couponfilter.buyprice - coupon.discountValue
+          coupon.payableprice = Couponfilter.buyprice - coupon.discountValue;
         }
-      })
-
-      function compare(a: Icoupon, b: Icoupon) {
-        if (a.payableprice as number < (b.payableprice as number)) {
-          return -1;
-        }
-        if (a.payableprice as number > (b.payableprice as number)) {
+      });
+  
+      // Sorting function
+      result.sort((a: Icoupon, b: Icoupon) => {
+        if (a.payableprice && b.payableprice) {
+          if (a.payableprice < b.payableprice) return -1;
+          if (a.payableprice > b.payableprice) return 1;
+          return 0;
+        } else if (!a.payableprice && b.payableprice) {
           return 1;
+        } else if (a.payableprice && !b.payableprice) {
+          return -1;
+        } else {
+          return 0;
         }
-        return 0;
-      }
-
-      result.sort(compare);
-
-
-      if (!result) {
-        throw new ApiError(statuscode.NotImplemented, errMSG.notFound('Coupon'))
-      }
-
+      });
+      console.log("Sorted result:", result);
+  
       return {
         statuscode: statuscode.ok,
-        Content: result,
+        Content: result
       };
     } catch (error: any) {
+      console.error("Error in getCoupons:", error);
       return {
         statuscode: error.statuscode || statuscode.InternalServerError,
         Content: {
           message: error.message || errMSG.defaultErrorMsg,
           data: error
         }
-      }
+      };
     }
   }
-
+  
   async createCoupon(coupon: Icoupon) {
     try {
 

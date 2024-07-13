@@ -8,7 +8,6 @@ export  interface IfilterProduct {
 }
 
 export interface Icouponfilter{
-    Amount : number,
     Quantity : number,
     Category : string,
     products : string,

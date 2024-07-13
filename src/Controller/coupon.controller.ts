@@ -34,13 +34,7 @@ export class CouponController {
 	@httpGet('/get', new Role().handler)
 	async getCoupon(req: Request, res: Response) {
 		try {
-			const couponData = {
-				Quantity: parseInt(req.query.Quantity as string),
-				Amount: parseInt(req.query.Amount as string),
-				products: req.query.Product as string,
-				Category: req.query.Category as string,
-				buyprice: parseInt(req.query.buyprice as string)
-			}
+			const couponData = req.query
 
 			const getCoupon = await this.couponService.getCoupons(couponData);
 
